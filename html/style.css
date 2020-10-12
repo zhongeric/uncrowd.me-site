@@ -1,0 +1,175 @@
+* {
+   font-family: Roboto, sans-serif;
+}
+
+body {
+    margin: 100px 0px 0px 15%;
+    background-color: #E5E5E5;
+}
+
+#header {
+    letter-spacing: .2px;
+    word-spacing: 3px;
+    font-size: 25px;
+    margin-bottom: 50px;
+}
+
+.sideAlignElem {
+    display: inline-block;
+    float: left;
+    width: 25%;
+    margin-right: 10%
+}
+
+h1 {
+    font-weight: 900;
+    margin-bottom: 0;
+}
+
+h2 {
+    /* font-weight: 500; */
+}
+
+.bold {
+  font-weight: 900;
+}
+
+.sub {
+  font-weight: thin;
+}
+
+.inputBox {
+    display: grid;
+    width: 100%;
+    /* height: 300px; */
+    background-color: white;
+    box-shadow: 2px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    padding: 30px;
+}
+
+.textIn {
+    margin-bottom: 10px;
+    padding-left: 10px;
+    height: 50px;
+    width: 70%;
+    font-size: 16px;
+    border: 0;
+    border-bottom: 3px solid #A6DFEB;
+    background: #F9F9F9;
+    border-radius: 5px 5px 0px 0px;
+    text-decoration: none;
+    outline: none;
+}
+
+.textIn::placeholder {
+
+    font-size: 16px;
+    font-family: Roboto
+    color: #555555;
+}
+
+.container {
+    display: inline-block;
+    position: relative;
+    padding-left: 35px;
+    margin-top: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 40%;
+    color: #555555;
+}
+
+.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    border: 1px solid #C4C4C4;
+    box-sizing: border-box;
+    border-radius: 6px;
+    background-color: #F9F9F9;
+}
+
+.container:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+.container input:checked ~ .checkmark {
+    background-color: #A6DFEB;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.container .checkmark:after {
+    left: 7px;
+    top: 4px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+.searchButt {
+    display: block;
+    padding: 15px;
+    background: #4DABF7;
+    border-radius: 8px;
+    text-align: center;
+    border: none;
+    color: white;
+    text-decoration: none;
+    font-size: 25px;
+    margin-left: 50%;
+    cursor: pointer;
+    /* margin-top: 90px; */
+}
+
+.bgElem {
+    display: inline-block;
+    height: 600px;
+    width: 20%;
+    margin-left: 5%;
+    margin-top: 130px
+}
+
+#bgImage {
+    position: absolute;
+    /* bottom: 70px; */
+    width: 15%;
+}
+
+#healthNote {
+    float: left;
+    width: 30%;
+    margin-left: 20%;
+    margin-top: 50px;
+    text-align: center;
+}
+
+.link {
+    color: #228BE6;
+    text-decoration: none;
+}
+
+.link:hover {
+    text-decoration: underline;
+}

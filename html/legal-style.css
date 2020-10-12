@@ -1,0 +1,29 @@
+* {
+   font-family: Roboto, sans-serif; 
+}
+
+body {
+    margin: 100px 20% 0px 20%;
+    background-color: #E5E5E5;
+}
+
+.infoBox {
+    display: block;
+    height: 280px;
+    width: 100%;
+}
+
+.header {
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    font-weight: 900;
+    height: inherit;
+    font-size: 40px;
+}
+
+h2 {
+    font-weight: 500;
+}

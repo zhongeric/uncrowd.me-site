@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>uncrowd.me</title>
+        <meta name="description" content="">
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+        <link rel="stylesheet" href="result-style.css">
+        <link rel="stylesheet" href="navigation.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+        <script data-ad-client="ca-pub-3764479507130379" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-165558952-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-165558952-1');
+        </script>
+
+    </head>
+    <style>
+      #btn-box {
+        display: grid;
+        grid-template-columns: auto;
+      }
+      .btn-deco {
+        border-radius: 2em;
+        text-align: center;
+        max-width: 100px;
+        font-size: 14px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+
+      #dataGraph {
+        grid-column: 1/-1;
+      }
+
+      #disclaimer {
+        display: block;
+        font-size: 12px;
+        font-weight: 400;
+        color: #868e96;
+        padding-top: 10px;
+      }
+    </style>
+    <ul class="navBar">
+        <li class="navElem" style="float: left;"><a href="index.html" style="padding: 10px 100px"><img id="logo" alt="Logo" src="images/logo.png"/>uncrowd.me</a></li>
+        <li class="navElem"><a href="about-us.html">About Us</a></li>
+        <li class="navElem"><a href="more-tools.html">More Tools</a></li>
+    </ul>
+    <body>
+        <div class="header">
+            <h2>Results:</h2>
+        </div>
+        <div class="timeBox">
+            <div class="dataBox">
+              <div class="metaInfo">
+                  <h2 id="name"></h2>
+                  <div id="btn-box">
+                    <div class="btn-deco" id="open-btn">
+                    </div>
+                  </div>
+                  <span id="disclaimer">Actual hours and data may vary. <a href="" style="text-decoration: none; outline: none;">Disclaimer</a></span>
+                  <h4 id="address"></h4>
+                  <span id="description"></span>
+              </div>
+                <div class="dataInfo">
+                    <!-- <h2>Free for the next 20 mins</h2> -->
+                </div>
+                <canvas id="dataGraph" width="" height=""></canvas>
+            </div>
+            <div class="mapBox" id="map-prev">
+
+            </div>
+            <a class="linkButt" href="index.html">Search Again</a>
+        </div>
+        <br>
+    <script>
+      $(document).ready(() => {
+
+        function loadSavedData() {
+          // since we save data in processing.html
+          var fromLocations = JSON.parse(localStorage.getItem("fromLocations"));
+          if(fromLocations){
+            // came from location results
+            // TODO: let's add another button to return to results
+            var tfid = localStorage.getItem("tfid");
+            var results = JSON.parse(localStorage.getItem("data"))
+            var data = {}
+            results.forEach(d => {
+              if(d.tfid == tfid){
+                data = d;
+              }
+            })
+          }
+          else {
+            var data = JSON.parse(localStorage.getItem("data"))[0];
+          }
+          console.log(data)
+          $('#name').html(data.name_address.split(",")[0]);
+          $('#address').html(data.name_address.split(",").slice(1,-1).join(","));
+          $('#description').html(data.description);
+
+          var d = new Date();
+          var hour = d.getHours();
+          var weekday = new Array(7);
+          var open = true;
+          weekday[0] = "Sunday";
+          weekday[1] = "Monday";
+          weekday[2] = "Tuesday";
+          weekday[3] = "Wednesday";
+          weekday[4] = "Thursday";
+          weekday[5] = "Friday";
+          weekday[6] = "Saturday";
+
+          var wk = weekday[d.getDay()];
+          if(data.hours_of_operation){
+            if(data.hours_of_operation[String(wk)][0] == "Closed"){
+              $('#open-btn').css('background-color',"#fa5252")
+              $('#open-btn').html("Closed Now")
+              open = false;
+            }
+            else {
+              var open = data.hours_of_operation[String(wk)][0][0]
+              var close = data.hours_of_operation[String(wk)][0][2]
+              if(hour >= open && hour <= close){
+                $('#open-btn').css("background-color","#51cf66")
+                $('#open-btn').html("Open Now")
+              }
+            }
+          }
+
+          // Popular times processing
+          // 0 is sunday for d.getDay, we have 7 as sunday
+          d.getDay() == 0 ? pt = data.popular_times[7] : pt = data.popular_times[String(d.getDay())];
+          if(open){
+            pt_data = pt[String(hour)]
+            console.log(pt_data[0])
+            console.log(pt_data[1])
+          }
+          else {
+            pt_data = [
+              "0","Closed"
+            ]
+          }
+
+          // var today_pt = pt;
+          var filtered_pt = {}
+
+          var live_offset, ctr = 0;
+
+          Object.keys(pt).filter(function(key) {
+              if(pt[key][0] != 0){
+                if(key == hour){
+                  live_offset = ctr;
+                }
+                filtered_pt[key] = pt[key][0];
+                ctr++;
+              }
+          });
+          var live_dataset = Array.from(Array(Object.keys(filtered_pt)), () => 0)
+          live_dataset[live_offset] = pt_data[0];
+
+          loadChart(filtered_pt, live_dataset)
+
+          var src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2853.6175193400404!2d${data.geometry.lat}!3d${data.geometry.lng}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s${data.tfid}!2sKroger!5e0!3m2!1sen!2sus!4v${Date.now()}!5m2!1sen!2sus`;
+          var embed = `
+          <iframe id="map-preview" src="${src}" width="100%" height="400" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+          `
+          $('#map-prev').html(embed);
+        }
+
+        loadSavedData();
+
+        // getData().then(function(data) {
+        //   // var data = parsed_data.data;
+        //   console.log(data)
+        //   $('#name').html(data.name_address.split(",")[0]);
+        //   $('#address').html(data.name_address.split(",").slice(1,-1).join(","));
+        //   $('#description').html(data.description);
+        //
+        //   var d = new Date();
+        //   var hour = d.getHours();
+        //   var weekday = new Array(7);
+        //   var open = true;
+        //   weekday[0] = "Sunday";
+        //   weekday[1] = "Monday";
+        //   weekday[2] = "Tuesday";
+        //   weekday[3] = "Wednesday";
+        //   weekday[4] = "Thursday";
+        //   weekday[5] = "Friday";
+        //   weekday[6] = "Saturday";
+        //
+        //   var wk = weekday[d.getDay()];
+        //   if(data.hours_of_operation){
+        //     if(data.hours_of_operation[String(wk)][0] == "Closed"){
+        //       $('#open-btn').css('background-color',"#fa5252")
+        //       $('#open-btn').html("Closed Now")
+        //       open = false;
+        //     }
+        //     else {
+        //       var open = data.hours_of_operation[String(wk)][0][0]
+        //       var close = data.hours_of_operation[String(wk)][0][2]
+        //       if(hour >= open && hour <= close){
+        //         $('#open-btn').css("background-color","#51cf66")
+        //         $('#open-btn').html("Open Now")
+        //       }
+        //     }
+        //   }
+        //
+        //   // Popular times processing
+        //   // 0 is sunday for d.getDay, we have 7 as sunday
+        //   d.getDay() == 0 ? pt = data.popular_times[7] : pt = data.popular_times[String(d.getDay())];
+        //   if(open){
+        //     pt_data = pt[String(hour)]
+        //     console.log(pt_data[0])
+        //     console.log(pt_data[1])
+        //   }
+        //   else {
+        //     pt_data = [
+        //       "0","Closed"
+        //     ]
+        //   }
+        //
+        //   // var today_pt = pt;
+        //   var filtered_pt = {}
+        //
+        //   var live_offset, ctr = 0;
+        //
+        //   Object.keys(pt).filter(function(key) {
+        //       if(pt[key][0] != 0){
+        //         if(key == hour){
+        //           live_offset = ctr;
+        //         }
+        //         filtered_pt[key] = pt[key][0];
+        //         ctr++;
+        //       }
+        //   });
+        //   var live_dataset = Array.from(Array(Object.keys(filtered_pt)), () => 0)
+        //   live_dataset[live_offset] = pt_data[0];
+        //
+        //   loadChart(filtered_pt, live_dataset)
+        //
+        //   var src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2853.6175193400404!2d${data.geometry.lat}!3d${data.geometry.lng}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s${data.tfid}!2sKroger!5e0!3m2!1sen!2sus!4v${Date.now()}!5m2!1sen!2sus`;
+        //   var embed = `
+        //   <iframe id="map-preview" src="${src}" width="100%" height="400" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+        //   `
+        //   $('#map-prev').html(embed);
+        // });
+
+      });
+
+      function loadChart(data, live_dataset) {
+        var ctx = document.getElementById('dataGraph').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{
+                    label: 'Crowd Index',
+                    data: Object.values(data),
+                    backgroundColor: [
+                        // 'rgba(54, 162, 235, 0.2)',
+                    ],
+                    borderColor: [
+                        // 'rgba(54, 162, 235, 1)',
+                    ],
+                    borderWidth: 1
+                },  {
+                  type: 'bar',
+                  label: 'Live',
+                  backgroundColor: "red",
+                  data: live_dataset
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        stacked: true,
+                        // type: 'time',
+                        // time: {
+                        //     unit: 'hour'
+                        // }
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            stacked: true,
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+      }
+
+      function getData() {
+        return new Promise((resolve, reject) => {
+          var status_id = localStorage.getItem('status_id');
+          let url = `https://app.uncrowd.me/api/status?id=${status_id}`
+          let max_retries = 5;
+          var retries = 0;
+          var git = setInterval(function () {
+            $.get(url, function (data) {
+                console.log(data);
+                if(data.status == "done"){
+                  Cookies.set('data', JSON.stringify(data), { expires: 1 });
+                  localStorage.setItem('data', JSON.stringify(data));
+                  clearInterval(git);
+                  resolve(data.result.data);
+                }
+                else if(data.status == "waiting") {
+                  // splash waiting
+                }
+                else if(data.status == "queued") {
+                  // splash waiting
+                }
+                else if(data.status == "failed") {
+                  // error page
+                }
+              }).fail(function(data, ts, xhr) {
+                console.log(data.status);
+                if(data.status == 429){
+                  // rate limited
+                }
+                retries++;
+                if(retries > max_retries){
+                  clearInterval(git);
+                  // do error handling here (timeout)
+                }
+              })
+          }, 500);
+        })
+
+      }
+
+      loadChart();
+    </script>
+    </body>
+</html>

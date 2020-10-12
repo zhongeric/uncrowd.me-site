@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Uncrowd.me</title>
+        <meta name="description" content="">
+        <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="navigation.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script data-ad-client="ca-pub-3764479507130379" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-165558952-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-165558952-1');
+        </script>
+
+    </head>
+    <style>
+      .select-wrapper {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+
+      #map {
+        min-height: 150px;
+        max-height: 250px;
+        min-width: 150px;
+        max-width: 100%;
+        margin-top: 20px;
+      }
+
+      #s-input-wrap {
+        max-height: 300px;
+      }
+
+      #mapView {
+        /* max-height: 150px; */
+      }
+
+      #left-sb {
+        margin-top: 10px;
+        max-width: 100px;
+        place-self: end;
+
+      }
+
+      #address-desc {
+        font-size: 14px;
+      }
+
+      .preloader {
+        align-items: center;
+        background: rgb(23, 22, 22, 0.3);
+        display: flex;
+        height: 100vh;
+        justify-content: center;
+        left: 0;
+        position: fixed;
+        top: 0;
+        transition: opacity 0.3s linear;
+        width: 100%;
+        z-index: 9999;
+      }
+
+      .hidden {
+        display: none;
+        opacity: 0;
+      }
+
+    </style>
+    <ul class="navBar">
+        <li class="navElem" style="float: left;"><a href="index.html" class="bold" style="padding: 10px 100px"><img id="logo" alt="Logo" src="images/logo.png"/>uncrowd.me</a></li>
+        <li class="navElem"><a href="about-us.html">About Us</a></li>
+        <li class="navElem" style="text-align: right;"><a href="more-tools.html">More Tools</a></li>
+    </ul>
+    <body>
+      <div class="preloader hidden" id="preloader-wrap">
+        <!-- USE THIS FOR 429 OR OTHER ERRORS -->
+        <img src="images/pacman.svg" alt="spinner">
+      </div>
+        <p id="header"><i>Uncrowd your life from unnecessary COVID exposure and keep your loved ones safe.</i></p>
+        <div class="sideAlignElem">
+            <h1 class="bold">Going somewhere?</h1>
+            <h2 class="sub">Find when your favorite spot is the least busy!</h2>
+            <form class="inputBox" id="s-input-wrap">
+                <input type="text" class="textIn" style="width: 85%" name="dest" id="dest" placeholder="Where to?">
+                <span id="address-desc"></span>
+                <!-- <input type="text" class="textIn" name="zip" id="zip" placeholder="Your Zipcode"> -->
+                <input type="hidden" name="lat" id="lat-1">
+                <input type="hidden" name="lng" id="lng-1">
+                <input type="hidden" name="place-name" id="place-name">
+                <button type="submit" class="searchButt" id="left-sb">
+                  Search
+                </button>
+            </form>
+            <div id="map"></div>
+        </div>
+        <div class="sideAlignElem">
+            <h1>Need Something?</h1>
+            <h2>Find less crowded places to shop / eat / right now!</h2>
+            <form class="inputBox" id="generic-form">
+                <input type="text" class="textIn" style="margin-bottom: 0px" id="zip-loc" name="zcodeLoc" placeholder="Your Zipcode">
+                <br>
+                <div class="select-wrapper">
+                  <div>
+                    <label class="container">Grocery Stores
+                        <input type="radio" name="typeInput" value="grocery_or_supermarket" checked>
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="container">Parks
+                        <input type="radio" name="typeInput" value="park">
+                        <span class="checkmark"></span>
+                    </label>
+                    <br>
+                    <label class="container">Restaurants
+                        <input type="radio" name="typeInput" value="restaurant">
+                        <span class="checkmark"></span>
+                    </label>
+                    <label class="container">Gas Stations
+                        <input type="radio" name="typeInput" value="gas_station">
+                        <span class="checkmark"></span>
+                    </label>
+                  </div>
+                  <button class="searchButt" id="right-sb">
+                    Search
+                  </button>
+                </div>
+                <input type="hidden" name="lat" id="lat-2">
+                <input type="hidden" name="lng" id="lng-2">
+            </form>
+        </div>
+        <div id="healthNote">
+            <h2 style="margin-bottom: 10px">Wear a mask. Save lives.</h2>
+            <a href="https://www.cdc.gov/coronavirus/2019-ncov/prevent-getting-sick/prevention.html" class="link">Click here for official safety tips from the CDC.</a>
+        </div>
+        <div class="bgElem">
+            <img id="bgImage" alt="Background Image" src="images/bgImage.png"/>
+        </div>
+        <footer>
+            <ul>
+                <li class="footElem"><a href="legal.html">Privacy Policy</a></li>
+                <li class="footElem"><a href="legal.html">Terms of Use</a></li>
+                <li class="footLLC"><a>© RecTable LLC, 2020</a></li>
+            </ul>
+        </footer>
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete"
+      async defer></script> -->
+      <script src="https://cdn.jsdelivr.net/npm/places.js@1.18.2"></script>
+
+      <script>
+      $(document).ready(() => {
+
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            console.log(position)
+            var geolocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            $('#lat-1').attr("value", position.coords.latitude);
+            $('#lat-2').attr("value", position.coords.latitude);
+            $('#lng-1').attr("value", position.coords.longitude);
+            $('#lng-2').attr("value", position.coords.longitude);
+          })
+        }
+
+        // var placesAutocomplete = places({
+        //   appId: 'plNDNNRUX1WE',
+        //   apiKey: '2537b0c2e441601f9da9ddad6e56df8d',
+        //   container: document.querySelector('#dest')
+        // });
+        //
+        // placesAutocomplete.configure({
+        //   aroundLatLngViaIP: true,
+        //   aroundRadius: 1500,
+        //   countries: ['us']
+        // })
+
+        document.getElementById('s-input-wrap').addEventListener('submit', function(e){
+          e.preventDefault();
+          // document.getElementById("preloader-wrap").classList.remove("hidden")
+          sendData(null);
+        })
+
+        document.getElementById('generic-form').addEventListener('submit', function(e){
+          e.preventDefault();
+          // document.getElementById("preloader-wrap").classList.remove("hidden")
+          var type = $('input[name="typeInput"]:checked').val();
+          genericSearch(type);
+        })
+
+      })
+
+      function genericSearch(type) {
+        let lat = document.getElementById("lat-2").value;
+        let lng = document.getElementById("lng-2").value;
+        let zip = document.getElementById("zip-loc").value;
+
+        if(zip ==  ""){
+          // error, not done searching yet
+          alert("Please input a valid zipcode!")
+          return;
+        }
+
+        let ts = Date.now();
+        let url = `https://app.uncrowd.me/api/popular_times/generic?lat=${lat}&lng=${lng}&zipcode=${zip}&ts=${ts}&type=${type}`
+        console.log(url)
+        $.get(url, function (data) {
+            console.log(data);
+            if(data.success && data.success == false){
+              if(data.error == "No results"){
+                alert("No results found. Sorry!")
+              }
+            }
+            if(data.status == "queued"){
+              console.log(data["job-id"])
+              Cookies.set('status_id', data["job-id"], { expires: 1 });
+              localStorage.setItem('status_id', JSON.stringify(data["job-id"]));
+            }
+            Cookies.set('zipcode', document.getElementById("zip-loc").value, { expires: 7 });
+            Cookies.set('returning', true, { expires: 7 });
+            localStorage.setItem('zipcode', document.getElementById("zip-loc").value);
+            localStorage.setItem('returning', true);
+            window.location.href = './processing.html';
+          })
+      }
+
+      function sendData(type) {
+        // TODO: post here, process response, save as cookies, redirect
+        let lat = document.getElementById("lat-1").value;
+        let lng = document.getElementById("lng-1").value;
+        let kw = document.getElementById("place-name").value;
+
+        if(lat == "" || lng == "" || kw == ""){
+          // error, not done searching yet
+          alert("Please input a valid address!")
+          return;
+        }
+
+        if(type == null){
+          type = ""; // for query purposes?
+        }
+
+        let address = document.getElementById("dest").value;
+        let ts = Date.now();
+        let url = `https://app.uncrowd.me/api/popular_times?lat=${lat}&lng=${lng}&address=${address}&keyword=${kw}&ts=${ts}&type=${type}`
+        console.log(url)
+        $.get(url, function (data) {
+            console.log(data);
+            var a = []
+            if(data.status == "queued"){
+              a.push(data["job-id"])
+              Cookies.set('status_id', a, { expires: 1 });
+              localStorage.setItem('status_id', JSON.stringify(a));
+            }
+            // Cookies.set('data', JSON.stringify(data), { expires: 1 })
+            Cookies.set('fromLocations', false, { expires: 1 });
+            localStorage.setItem('fromLocations', false);;
+            Cookies.set('zipcode', document.getElementById("zip-loc").value, { expires: 7 });
+            Cookies.set('returning', true, { expires: 7 });
+            localStorage.setItem('zipcode', document.getElementById("zip-loc").value);
+            localStorage.setItem('returning', true);
+            window.location.href = './processing.html';
+          })
+      }
+
+
+      document.getElementById('generic-form').addEventListener('submit', function(e){
+        e.preventDefault();
+
+      })
+
+
+      function initPAC() {
+        var input = document.getElementById("dest");
+        var autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.setFields(
+            ['address_components', 'geometry', 'name']);
+
+        autocomplete.addListener('place_changed', function() {
+          var place = autocomplete.getPlace();
+
+          document.getElementById("place-name").value = place.name;
+          console.log(place)
+
+          $('#lat-1').attr("value", place.geometry.location.lat());
+          $('#lng-1').attr("value", place.geometry.location.lng());
+
+          var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 13,
+            center: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()}
+          });
+
+          var marker = new google.maps.Marker({position: {lat: place.geometry.location.lat(), lng: place.geometry.location.lng()}, map: map});
+
+          var address = '';
+          if (place.address_components) {
+            address = [
+              (place.address_components[0] && place.address_components[0].short_name || ''),
+              (place.address_components[1] && place.address_components[1].short_name || ''),
+              (place.address_components[2] && place.address_components[2].short_name || '')
+            ].join(' ');
+            document.getElementById("address-desc").innerHTML = address;
+            document.getElementById("zip-loc").value = place.address_components[6] && place.address_components[6].short_name || '';
+          }
+
+          console.log(address)
+        })
+      }
+
+      </script>
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCcqyeghNrk6pQiRpMG9tT8p6kX5PAZfCo&libraries=places&callback=initPAC"
+      async defer></script>
+      <script src="assets/js/cvt.js"></script>
+    </body>
+</html>
